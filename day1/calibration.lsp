@@ -1,3 +1,4 @@
+;function declarations
 (defun char-to-int (char)
   (- (char-int char) (char-int #\0)))
 
@@ -20,21 +21,26 @@
 
 
 (defun first-and-last-numbers-from-file (filename)
-  (with-open-file (stream filename :direction :input)
-    (loop for line = (read-line stream nil nil)
-          while line
-          collect (let ((first (first-number line))
-                        (last (last-number line)))
-                    (when (and first last)
-                      (+ first last))))))
+  (let ((lines (read-lines-from-file filename)))
+    (loop for line in lines
+          collect (concatenate 'string
+                       (write-to-string (first-number line))
+                       (write-to-string (last-number line))))))
+  
+
+(defun convert-to-integers (numbers)
+  (mapcar #'parse-integer numbers))
 
 
-(defun print-sum (number)
-  (format t "The sum is: ~a~%" number))
+(defun print-sum (numbers)
+  (let ((integers (convert-to-integers numbers)))
+    (format t "The sum is: ~a~%" (apply #'+ integers))))
 
 
 (defun print-calibration (filename)
   (let ((calibration-values (first-and-last-numbers-from-file filename)))
-    (print-sum (apply #'+ calibration-values))))
+    (print-sum calibration-values)))
 
+
+; function calls
 (print-calibration '"./calibration.txt")
